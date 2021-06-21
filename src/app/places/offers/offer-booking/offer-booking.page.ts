@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-offer-booking',
@@ -6,10 +8,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./offer-booking.page.scss'],
 })
 export class OfferBookingPage implements OnInit {
-
-  constructor() { }
-
+  constructor(private activatedRoute: ActivatedRoute) {}
+  offerId: string;
   ngOnInit() {
+    this.activatedRoute.params.subscribe((data: any) => {
+      this.offerId = data.placeId;
+    });
   }
-
 }

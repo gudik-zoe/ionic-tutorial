@@ -17,6 +17,10 @@
           <ion-card-content>
             <p>{{place.description}}</p>
           </ion-card-content>
+          <div>
+            <ion-button fill="clear" color="primary" [routerLink]="['/' , 'places', 'discover'  ,place.id ]">
+              More</ion-button>
+          </div>
         </ion-card>
       </ion-col>
     </ion-row>

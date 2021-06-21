@@ -1,9 +1,24 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/places/discover">
+
+      </ion-back-button>
+    </ion-buttons>
     <ion-title>place-details</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <ion-card *ngIf="thePlace">
+    <ion-card-header>
+      <ion-card-title>{{thePlace.title}}</ion-card-title>
+      <ion-card-title>{{thePlace.price | currency}}/Night</ion-card-title>
+    </ion-card-header>
+    <ion-img [src]="thePlace.imageUrl"></ion-img>
+    <ion-card-content>
+      <p>{{thePlace.description}}</p>
+    </ion-card-content>
+  </ion-card>
+  <ion-button color="primary" (click)="bookPlace()">Book</ion-button>
 </ion-content>
