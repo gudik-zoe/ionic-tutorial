@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Discover Places</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row *ngFor="let place of places">
+      <ion-col size="12" size-sm="8" offset-sm="2" text-center>
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>{{place.title}}</ion-card-title>
+            <ion-card-title>{{place.price | currency}}/Night</ion-card-title>
+          </ion-card-header>
+          <ion-img [src]="place.imageUrl"></ion-img>
+          <ion-card-content>
+            <p>{{place.description}}</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
