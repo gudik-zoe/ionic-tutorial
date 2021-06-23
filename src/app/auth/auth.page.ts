@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthServiceService } from './auth-service.service';
 
 @Component({
   selector: 'app-auth',
@@ -6,10 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./auth.page.scss'],
 })
 export class AuthPage implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
+  constructor(private authService: AuthServiceService) {}
+  login() {
+    this.authService.login();
   }
-
+  ngOnInit() {}
 }

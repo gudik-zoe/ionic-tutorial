@@ -14,17 +14,17 @@ const routes: Routes = [
       import('./new-offer/new-offer.module').then((m) => m.NewOfferPageModule),
   },
   {
-    path: 'edit/:placeId',
-    loadChildren: () =>
-      import('./edit-offer/edit-offer.module').then(
-        (m) => m.EditOfferPageModule
-      ),
-  },
-  {
     path: ':placeId',
     loadChildren: () =>
       import('./offer-booking/offer-booking.module').then(
         (m) => m.OfferBookingPageModule
+      ),
+  },
+  {
+    path: 'edit/:placeId',
+    loadChildren: () =>
+      import('./edit-offer/edit-offer.module').then(
+        (m) => m.EditOfferPageModule
       ),
   },
 ];

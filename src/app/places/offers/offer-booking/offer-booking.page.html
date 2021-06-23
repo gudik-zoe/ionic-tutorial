@@ -8,6 +8,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content *ngIf="offerId">
-  <ion-button color="primary" [routerLink]="['/','palces','offers','edit', offerId]"> Edit</ion-button>
+<ion-content *ngIf="offer">
+  <h2>{{offer.title}}</h2>
+  <ion-button color="primary" [routerLink]="['/','places','offers','edit', offer.id]"> Edit</ion-button>
 </ion-content>
