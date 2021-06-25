@@ -17,8 +17,10 @@
             <ion-card-title>{{place.price | currency}}/Night</ion-card-title>
           </ion-card-header>
           <ion-img [src]="place.imageUrl"></ion-img>
-          <ion-card-content>
-            <p>{{place.description}}</p>
+          <ion-card-content justify-content-center>
+            <p>
+              <ion-label color="red">{{place.description}} </ion-label>
+            </p>
           </ion-card-content>
           <div>
             <ion-button fill="clear" color="primary" [routerLink]="['/' , 'places', 'discover'  ,place.id ]">
