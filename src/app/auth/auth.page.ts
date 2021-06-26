@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 import { AuthServiceService } from './auth-service.service';
 
 @Component({
@@ -10,11 +12,20 @@ import { AuthServiceService } from './auth-service.service';
 export class AuthPage implements OnInit {
   constructor(
     private authService: AuthServiceService,
-    private router: Router
+    private router: Router,
+    private loadingCtrl: LoadingController
   ) {}
   login() {
+    this.loadingCtrl
+      .create({ keyboardClose: true, message: 'loggin in' })
+      .then((loadingEl) => {
+        loadingEl.present();
+        setTimeout(() => {
+          this.router.navigate(['/places/discover']);
+          loadingEl.dismiss();
+        }, 1500);
+      });
     this.authService.login();
-    this.router.navigate(['/places/discover']);
   }
   ngOnInit() {}
 }

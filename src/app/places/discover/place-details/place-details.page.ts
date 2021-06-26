@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalController, NavController } from '@ionic/angular';
+import {
+  ActionSheetController,
+  ModalController,
+  NavController,
+} from '@ionic/angular';
 import { CreateBookingComponent } from '../../../bookings/create-booking/create-booking.component';
 import { Place } from '../../place.model';
 import { PlacesService } from '../../places.service';
@@ -17,7 +21,8 @@ export class PlaceDetailsPage implements OnInit {
     private activeRoute: ActivatedRoute,
     private router: Router,
     private navCtrl: NavController,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private actionSheetCtrl: ActionSheetController
   ) {}
   thePlace: Place;
 
@@ -26,6 +31,33 @@ export class PlaceDetailsPage implements OnInit {
     //it goes back
     // this.navCtrl.pop();
     // this.navCtrl.navigateBack('/places/discover');
+    this.actionSheetCtrl
+      .create({
+        header: 'choose an action',
+        buttons: [
+          {
+            text: 'Select date',
+            handler: () => {
+              this.openBookingModel('select');
+            },
+          },
+          {
+            text: 'Random date',
+            handler: () => {
+              this.openBookingModel('random');
+            },
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+          },
+        ],
+      })
+      .then((actionSheetEl) => actionSheetEl.present());
+  }
+
+  openBookingModel(mode: 'select' | 'random') {
+    console.log(mode);
     this.modalCtrl
       .create({
         component: CreateBookingComponent,
