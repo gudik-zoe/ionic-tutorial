@@ -1,18 +1,41 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>auth</ion-title>
+    <ion-title> {{ isLoggedIn ? 'login' : 'signUp' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <ion-item>
-      <ion-label position="floating">E-mail</ion-label>
-      <ion-input></ion-input>
-    </ion-item>
-  </ion-list>
-  <ion-button color="primary" (click)="login()">login </ion-button>
-  <!-- <div class="theDiv">
-    <ion-spinner color="primary" *ngIf="isLoading"></ion-spinner>
-  </div> -->
+  <form #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
+    <ion-grid>
+      <ion-row>
+        <ion-col size-sm="6" offset-sm="3">
+          <ion-list>
+            <ion-item>
+              <ion-label position="floating">E-mail</ion-label>
+              <ion-input type="email" ngModel name="email" required email #emailErrMessage="ngModel"></ion-input>
+            </ion-item>
+            <ion-item lines="none" *ngIf="!emailErrMessage.valid && emailErrMessage.touched">
+              <p>please enter a valid email adress</p>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">password</ion-label>
+              <ion-input type="password" ngModel name="password" required minLength="6" #passwordErrMessage="ngModel">
+              </ion-input>
+            </ion-item>
+            <ion-item lines="none" *ngIf="!passwordErrMessage.valid && passwordErrMessage.touched">
+              <p>password should have more than 6 characters</p>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size-sm="6" offset-sm="3">
+          <ion-button color="primary" fill="clear" expand="block" type="button" (click)="switchAuthMode()">switch to
+            {{ isLoggedIn ? 'login' : 'signUp' }}</ion-button>
+          <ion-button color="primary" (click)="login()" expand="block" type="submit" [disabled]="!myForm.valid">login
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </form>
 </ion-content>

@@ -6,10 +6,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./new-offer.page.scss'],
 })
 export class NewOfferPage implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
+  constructor() {}
+  onCreateOffer() {
+    console.log('creating an offer');
   }
-
+  ngOnInit() {}
 }
