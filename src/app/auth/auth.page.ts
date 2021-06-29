@@ -44,7 +44,7 @@ export class AuthPage implements OnInit {
         setTimeout(() => {
           this.router.navigate(['/places/discover']);
           loadingEl.dismiss();
-        }, 1500);
+        }, 500);
       });
     this.authService.login();
   }
