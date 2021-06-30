@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/member-ordering */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   ActionSheetController,
   ModalController,
   NavController,
 } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 import { CreateBookingComponent } from '../../../bookings/create-booking/create-booking.component';
 import { Place } from '../../place.model';
 import { PlacesService } from '../../places.service';
@@ -15,7 +16,7 @@ import { PlacesService } from '../../places.service';
   templateUrl: './place-details.page.html',
   styleUrls: ['./place-details.page.scss'],
 })
-export class PlaceDetailsPage implements OnInit {
+export class PlaceDetailsPage implements OnInit, OnDestroy {
   constructor(
     private placesService: PlacesService,
     private activeRoute: ActivatedRoute,
@@ -24,7 +25,11 @@ export class PlaceDetailsPage implements OnInit {
     private modalCtrl: ModalController,
     private actionSheetCtrl: ActionSheetController
   ) {}
+  thePlaceSub: Subscription;
   thePlace: Place;
+  ngOnDestroy() {
+    this.thePlaceSub.unsubscribe();
+  }
 
   bookPlace() {
     // this.router.navigate(['/places/discover']);
@@ -61,14 +66,14 @@ export class PlaceDetailsPage implements OnInit {
     this.modalCtrl
       .create({
         component: CreateBookingComponent,
-        componentProps: { selectedPlace: this.thePlace },
+        componentProps: { selectedPlace: this.thePlace, selectedMode: mode },
       })
       .then((modalEl) => {
         modalEl.present();
         return modalEl.onDidDismiss();
       })
       .then((result: any) => {
-        // console.log(result.data, result.role);
+        console.log(result.data, result.role);
         if (result.role === 'confirm') {
           console.log('booked');
         }
@@ -77,7 +82,11 @@ export class PlaceDetailsPage implements OnInit {
 
   ngOnInit() {
     this.activeRoute.params.subscribe((data: any) => {
-      this.thePlace = this.placesService.getPlaceById(data.placeId);
+      this.thePlaceSub = this.placesService
+        .getPlaceById(data.placeId)
+        .subscribe((place) => {
+          this.thePlace = data;
+        });
     });
   }
 }
