@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { AuthServiceService } from '../auth/auth-service.service';
 import { Place } from './place.model';
-import { take, map } from 'rxjs/operators';
+import { take, map, tap, delay } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -63,7 +63,7 @@ export class PlacesService {
       70,
       new Date('2020-01-01'),
       new Date('2020-12-31'),
-      'a'
+      'B'
     ),
   ]);
 
@@ -97,9 +97,39 @@ export class PlacesService {
       dateTo,
       this.authService.userId
     );
-    this.places.pipe(take(1)).subscribe((data) => {
-      this.places.next(data.concat(newPlace));
-    });
-    console.log('done');
+    return this.places.pipe(
+      take(1),
+      delay(1000),
+      tap((places) => {
+        setTimeout(() => {
+          this.places.next(places.concat(newPlace));
+        }, 1000);
+      })
+    );
+  }
+
+  updatePlace(placeId: string, title: string, description: string) {
+    return this.places.pipe(
+      take(1),
+      delay(1000),
+      tap((places) => {
+        const updatedPlaceIndex = places.findIndex(
+          (place) => (place.id = placeId)
+        );
+        const updatedPlaces = [...places];
+        const oldPlace = updatedPlaces[updatedPlaceIndex];
+        updatedPlaces[updatedPlaceIndex] = new Place(
+          oldPlace.id,
+          title,
+          description,
+          oldPlace.imageUrl,
+          oldPlace.price,
+          oldPlace.availableFrom,
+          oldPlace.availableTo,
+          oldPlace.userId
+        );
+        this.places.next(updatedPlaces);
+      })
+    );
   }
 }

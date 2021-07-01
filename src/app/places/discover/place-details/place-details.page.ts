@@ -1,12 +1,17 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   ActionSheetController,
+  LoadingController,
   ModalController,
   NavController,
 } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+import { AuthServiceService } from 'src/app/auth/auth-service.service';
+import { Booking } from 'src/app/bookings/booking.model';
+import { BookingService } from 'src/app/bookings/booking.service';
 import { CreateBookingComponent } from '../../../bookings/create-booking/create-booking.component';
 import { Place } from '../../place.model';
 import { PlacesService } from '../../places.service';
@@ -23,19 +28,19 @@ export class PlaceDetailsPage implements OnInit, OnDestroy {
     private router: Router,
     private navCtrl: NavController,
     private modalCtrl: ModalController,
-    private actionSheetCtrl: ActionSheetController
+    private actionSheetCtrl: ActionSheetController,
+    private bookingService: BookingService,
+    private loadingCtrl: LoadingController,
+    private authService: AuthServiceService
   ) {}
   thePlaceSub: Subscription;
   thePlace: Place;
+  isBookable: boolean = false;
   ngOnDestroy() {
     this.thePlaceSub.unsubscribe();
   }
 
   bookPlace() {
-    // this.router.navigate(['/places/discover']);
-    //it goes back
-    // this.navCtrl.pop();
-    // this.navCtrl.navigateBack('/places/discover');
     this.actionSheetCtrl
       .create({
         header: 'choose an action',
@@ -75,7 +80,26 @@ export class PlaceDetailsPage implements OnInit, OnDestroy {
       .then((result: any) => {
         console.log(result.data, result.role);
         if (result.role === 'confirm') {
-          console.log('booked');
+          this.loadingCtrl
+            .create({ message: 'Booking..place' })
+            .then((loader) => {
+              loader.present();
+              const bookingData = result.data.bookingData;
+              this.bookingService
+                .addBooking(
+                  this.thePlace.id,
+                  this.thePlace.title,
+                  this.thePlace.imageUrl,
+                  bookingData.firstName,
+                  bookingData.lastName,
+                  bookingData.guestNumber,
+                  bookingData.startDate,
+                  bookingData.endDate
+                )
+                .subscribe(() => {
+                  loader.dismiss();
+                });
+            });
         }
       });
   }
@@ -85,7 +109,8 @@ export class PlaceDetailsPage implements OnInit, OnDestroy {
       this.thePlaceSub = this.placesService
         .getPlaceById(data.placeId)
         .subscribe((place) => {
-          this.thePlace = data;
+          this.thePlace = place;
+          this.isBookable = place.userId !== this.authService.userId;
         });
     });
   }
