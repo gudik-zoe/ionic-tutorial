@@ -1,18 +1,23 @@
+/* eslint-disable @typescript-eslint/semi */
 /* eslint-disable arrow-body-style */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/quotes */
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, of, Subject } from 'rxjs';
 import { AuthServiceService } from '../auth/auth-service.service';
 import { Place } from './place.model';
-import { take, map, tap, delay } from 'rxjs/operators';
+import { take, map, tap, delay, switchMap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlacesService {
-  constructor(private authService: AuthServiceService) {}
+  constructor(
+    private authService: AuthServiceService,
+    private http: HttpClient
+  ) {}
 
   private places = new BehaviorSubject<Place[]>([
     new Place(
@@ -72,12 +77,58 @@ export class PlacesService {
   }
 
   getPlaceById(id: string) {
-    return this.places.pipe(
-      take(1),
-      map((places) => {
-        return { ...places.find((p) => p.id === id) };
-      })
-    );
+    return this.http
+      .get(
+        'https://ionic-tutorial-e1439-default-rtdb.europe-west1.firebasedatabase.app/offered-places/' +
+          id +
+          '.json'
+      )
+      .pipe(
+        map((place: Place) => {
+          return new Place(
+            id,
+            place.title,
+            place.description,
+            place.imageUrl,
+            place.price,
+            new Date(place.availableFrom),
+            new Date(place.availableTo),
+            place.userId
+          );
+        })
+      );
+  }
+
+  fetchPlacesFromBE() {
+    return this.http
+      .get<{ [key: string]: Place }>(
+        'https://ionic-tutorial-e1439-default-rtdb.europe-west1.firebasedatabase.app/offered-places.json'
+      )
+      .pipe(
+        map((resData) => {
+          const places = [];
+          for (const key in resData) {
+            if (resData.hasOwnProperty(key)) {
+              places.push(
+                new Place(
+                  key,
+                  resData[key].title,
+                  resData[key].description,
+                  resData[key].imageUrl,
+                  resData[key].price,
+                  new Date(resData[key].availableFrom),
+                  new Date(resData[key].availableTo),
+                  resData[key].userId
+                )
+              );
+            }
+          }
+          return places;
+        }),
+        tap((places) => {
+          this.places.next(places);
+        })
+      );
   }
 
   addPlace(
@@ -87,6 +138,7 @@ export class PlacesService {
     dateFrom: Date,
     dateTo: Date
   ) {
+    let generatedId: string;
     const newPlace = new Place(
       Math.random().toString(),
       title,
@@ -97,26 +149,52 @@ export class PlacesService {
       dateTo,
       this.authService.userId
     );
-    return this.places.pipe(
-      take(1),
-      delay(1000),
-      tap((places) => {
-        setTimeout(() => {
-          this.places.next(places.concat(newPlace));
-        }, 1000);
-      })
-    );
+    return this.http
+      .post<{ name: string }>(
+        'https://ionic-tutorial-e1439-default-rtdb.europe-west1.firebasedatabase.app/offered-places.json',
+        {
+          ...newPlace,
+          id: null,
+        }
+      )
+      .pipe(
+        switchMap((resData) => {
+          generatedId = resData.name;
+          return this.places;
+        }),
+        take(1),
+        tap((resData) => {
+          newPlace.id = generatedId;
+          this.places.next(resData.concat(newPlace));
+        })
+      );
+    // return this.places.pipe(
+    //   take(1),
+    //   delay(1000),
+    //   tap((places) => {
+    //     setTimeout(() => {
+    //       this.places.next(places.concat(newPlace));
+    //     }, 1000);
+    //   })
+    // );
   }
 
   updatePlace(placeId: string, title: string, description: string) {
+    let updatedPlaces: Place[];
     return this.places.pipe(
       take(1),
-      delay(1000),
-      tap((places) => {
+      switchMap((places) => {
+        if (!places || places.length <= 0) {
+          return this.fetchPlacesFromBE();
+        } else {
+          return of(places);
+        }
+      }),
+      switchMap((places) => {
         const updatedPlaceIndex = places.findIndex(
-          (place) => (place.id = placeId)
+          (place) => place.id === placeId
         );
-        const updatedPlaces = [...places];
+        updatedPlaces = [...places];
         const oldPlace = updatedPlaces[updatedPlaceIndex];
         updatedPlaces[updatedPlaceIndex] = new Place(
           oldPlace.id,
@@ -128,8 +206,26 @@ export class PlacesService {
           oldPlace.availableTo,
           oldPlace.userId
         );
+        return this.http.put(
+          'https://ionic-tutorial-e1439-default-rtdb.europe-west1.firebasedatabase.app/offered-places/' +
+            placeId +
+            '.json',
+          { ...updatedPlaces[updatedPlaceIndex], id: null }
+        );
+      }),
+      tap(() => {
         this.places.next(updatedPlaces);
       })
     );
+    // return this.places.pipe(
+    //   take(1),
+    //   delay(1000),
+    //   tap((places) => {
+    //     const updatedPlaceIndex = places.findIndex(
+    //       (place) => (place.id = placeId)
+    //     );
+    //     this.places.next(updatedPlaces);
+    //   })
+    // );
   }
 }

@@ -16,8 +16,12 @@
   <ion-grid>
     <ion-row>
       <ion-col>
+        <div *ngIf="loading">
+          <ion-spinner></ion-spinner>
+        </div>
         <ion-card size="12" size-xm="8" offset-sm="2">
-          <ion-list>
+          <p *ngIf="offers.length  === 0 ">no offers!</p>
+          <ion-list *ngIf="!loading && offers.length > 0">
             <ion-item-sliding *ngFor="let offer of offers" #slidingItem>
               <app-offer-item [offer]="offer"></app-offer-item>
               <ion-item-options side="end">

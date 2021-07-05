@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/type-annotation-spacing */
 import { Component, OnDestroy, OnInit } from '@angular/core';
@@ -29,6 +30,8 @@ export class EditOfferPage implements OnInit, OnDestroy {
   }
   placeSub: Subscription;
   editForm: FormGroup;
+  loading: boolean = false;
+  placeId: string;
 
   submitEditForm() {
     if (!this.editForm.valid) {
@@ -52,6 +55,8 @@ export class EditOfferPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.activatedRoute.params.subscribe((data: any) => {
+      this.placeId = data.placeId;
+      this.loading = true;
       this.placeSub = this.placesService
         .getPlaceById(data.placeId)
         .subscribe((place) => {
@@ -66,6 +71,7 @@ export class EditOfferPage implements OnInit, OnDestroy {
               validators: [Validators.required, Validators.maxLength(180)],
             }),
           });
+          this.loading = false;
         });
     });
   }

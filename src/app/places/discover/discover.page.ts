@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Place } from '../place.model';
@@ -25,6 +26,7 @@ export class DiscoverPage implements OnInit, OnDestroy {
   places: Place[];
   placesToBeLoad: Place[];
   relevantPlaces: Place[];
+  loading: boolean = false;
 
   onFilter(event: CustomEvent<SegmentChangeEventDetail>) {
     if (event.detail.value === 'allPlaces') {
@@ -42,6 +44,13 @@ export class DiscoverPage implements OnInit, OnDestroy {
       this.places = data;
       this.relevantPlaces = this.places;
       this.placesToBeLoad = this.relevantPlaces.slice(1);
+    });
+  }
+
+  ionViewWillEnter() {
+    this.loading = true;
+    this.placesService.fetchPlacesFromBE().subscribe(() => {
+      this.loading = false;
     });
   }
 }
