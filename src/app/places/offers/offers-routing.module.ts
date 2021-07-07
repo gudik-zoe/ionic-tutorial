@@ -13,13 +13,13 @@ const routes: Routes = [
     loadChildren: () =>
       import('./new-offer/new-offer.module').then((m) => m.NewOfferPageModule),
   },
-  {
-    path: ':placeId',
-    loadChildren: () =>
-      import('./offer-booking/offer-booking.module').then(
-        (m) => m.OfferBookingPageModule
-      ),
-  },
+  // {
+  //   path: ':placeId',
+  //   loadChildren: () =>
+  //     import('./offer-booking/offer-booking.module').then(
+  //       (m) => m.OfferBookingPageModule
+  //     ),
+  // },
   {
     path: 'edit/:placeId',
     loadChildren: () =>

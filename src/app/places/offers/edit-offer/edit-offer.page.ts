@@ -4,7 +4,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LoadingController, NavController } from '@ionic/angular';
+import {
+  AlertController,
+  LoadingController,
+  NavController,
+} from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { Place } from '../../place.model';
 import { PlacesService } from '../../places.service';
@@ -21,7 +25,8 @@ export class EditOfferPage implements OnInit, OnDestroy {
     private placesService: PlacesService,
     private navCtrl: NavController,
     private router: Router,
-    private loadingCtrl: LoadingController
+    private loadingCtrl: LoadingController,
+    private alertCtrl: AlertController
   ) {}
   ngOnDestroy(): void {
     if (this.placeSub) {
@@ -57,9 +62,8 @@ export class EditOfferPage implements OnInit, OnDestroy {
     this.activatedRoute.params.subscribe((data: any) => {
       this.placeId = data.placeId;
       this.loading = true;
-      this.placeSub = this.placesService
-        .getPlaceById(data.placeId)
-        .subscribe((place) => {
+      this.placeSub = this.placesService.getPlaceById(data.placeId).subscribe(
+        (place) => {
           this.place = place;
           this.editForm = new FormGroup({
             title: new FormControl(this.place.title, {
@@ -72,7 +76,26 @@ export class EditOfferPage implements OnInit, OnDestroy {
             }),
           });
           this.loading = false;
-        });
+        },
+        (error) => {
+          this.alertCtrl
+            .create({
+              header: 'an error occured',
+              message: 'place could not be fetch try again later',
+              buttons: [
+                {
+                  text: 'Okay',
+                  handler: () => {
+                    this.router.navigate(['/places/discover']);
+                  },
+                },
+              ],
+            })
+            .then((alertEl) => {
+              alertEl.present();
+            });
+        }
+      );
     });
   }
 }

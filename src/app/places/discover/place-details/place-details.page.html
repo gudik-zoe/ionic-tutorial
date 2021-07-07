@@ -2,14 +2,15 @@
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/places/discover">
-
       </ion-back-button>
     </ion-buttons>
-    <ion-title *ngIf="thePlace">{{thePlace.title}}</ion-title>
+    <ion-title *ngIf="!loading">{{thePlace.title}}</ion-title>
   </ion-toolbar>
 </ion-header>
-
-<ion-content *ngIf="thePlace">
+<div *ngIf="loading">
+  <ion-spinner></ion-spinner>
+</div>
+<ion-content *ngIf="!loading">
   <ion-grid>
     <ion-row>
       <ion-col size-sm="6" offset-sm="3">

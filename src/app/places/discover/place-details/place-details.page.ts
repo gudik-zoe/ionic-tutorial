@@ -4,6 +4,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   ActionSheetController,
+  AlertController,
   LoadingController,
   ModalController,
   NavController,
@@ -31,11 +32,13 @@ export class PlaceDetailsPage implements OnInit, OnDestroy {
     private actionSheetCtrl: ActionSheetController,
     private bookingService: BookingService,
     private loadingCtrl: LoadingController,
-    private authService: AuthServiceService
+    private authService: AuthServiceService,
+    private alertCtrl: AlertController
   ) {}
   thePlaceSub: Subscription;
   thePlace: Place;
   isBookable: boolean = false;
+  loading: boolean = false;
   ngOnDestroy() {
     this.thePlaceSub.unsubscribe();
   }
@@ -78,7 +81,6 @@ export class PlaceDetailsPage implements OnInit, OnDestroy {
         return modalEl.onDidDismiss();
       })
       .then((result: any) => {
-        console.log(result.data, result.role);
         if (result.role === 'confirm') {
           this.loadingCtrl
             .create({ message: 'Booking..place' })
@@ -96,9 +98,15 @@ export class PlaceDetailsPage implements OnInit, OnDestroy {
                   bookingData.startDate,
                   bookingData.endDate
                 )
-                .subscribe(() => {
-                  loader.dismiss();
-                });
+                .subscribe(
+                  (data) => {
+                    console.log(data);
+                    loader.dismiss();
+                  },
+                  (error) => {
+                    console.log('error occured');
+                  }
+                );
             });
         }
       });
@@ -106,12 +114,35 @@ export class PlaceDetailsPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.activeRoute.params.subscribe((data: any) => {
+      this.loading = true;
       this.thePlaceSub = this.placesService
         .getPlaceById(data.placeId)
-        .subscribe((place) => {
-          this.thePlace = place;
-          this.isBookable = place.userId !== this.authService.userId;
-        });
+        .subscribe(
+          (place) => {
+            console.log('im here');
+            this.loading = false;
+            this.thePlace = place;
+            this.isBookable = place.userId !== this.authService.userId;
+          },
+          (error) => {
+            this.alertCtrl
+              .create({
+                header: 'an error occured',
+                message: 'no place found',
+                buttons: [
+                  {
+                    text: 'okay',
+                    handler: () => {
+                      this.router.navigate(['/places/discover']);
+                    },
+                  },
+                ],
+              })
+              .then((alertEl) => {
+                alertEl.present();
+              });
+          }
+        );
     });
   }
 }
