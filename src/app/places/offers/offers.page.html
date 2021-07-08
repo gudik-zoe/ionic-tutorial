@@ -23,7 +23,7 @@
           <p *ngIf="offers.length  === 0 ">no offers!</p>
           <ion-list *ngIf="!loading && offers.length > 0">
             <ion-item-sliding *ngFor="let offer of offers" #slidingItem>
-              <app-offer-item [offer]="offer"></app-offer-item>
+              <app-offer-item [offer]="offer" (click)="openModal(offer)"></app-offer-item>
               <ion-item-options side="end">
                 <ion-item-option color="secondary" (click)="onEdit(offer.id , slidingItem)">
 

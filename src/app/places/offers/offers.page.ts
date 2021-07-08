@@ -2,10 +2,15 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonItemSliding, LoadingController } from '@ionic/angular';
+import {
+  IonItemSliding,
+  LoadingController,
+  ModalController,
+} from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { Place } from '../place.model';
 import { PlacesService } from '../places.service';
+import { ProvaModelComponent } from './prova-model/prova-model.component';
 
 @Component({
   selector: 'app-offers',
@@ -16,7 +21,8 @@ export class OffersPage implements OnInit, OnDestroy {
   constructor(
     private placesService: PlacesService,
     private router: Router,
-    private loadinCtrl: LoadingController
+    private loadinCtrl: LoadingController,
+    private modalCtrl: ModalController
   ) {}
   ngOnDestroy(): void {
     if (this.placesSub) {
@@ -35,6 +41,21 @@ export class OffersPage implements OnInit, OnDestroy {
     this.placesSub = this.placesService.getPlaces().subscribe((data) => {
       this.offers = data;
     });
+  }
+
+  openModal(offer: Place) {
+    this.modalCtrl
+      .create({
+        component: ProvaModelComponent,
+        componentProps: { theOffer: offer },
+      })
+      .then((modalEl) => {
+        modalEl.present();
+        return modalEl.onDidDismiss();
+      })
+      .then((result) => {
+        console.log(result);
+      });
   }
   ionViewWillEnter() {
     this.loading = true;

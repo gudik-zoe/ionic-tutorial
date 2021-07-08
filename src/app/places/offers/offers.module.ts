@@ -8,6 +8,7 @@ import { OffersPageRoutingModule } from './offers-routing.module';
 
 import { OffersPage } from './offers.page';
 import { OfferItemComponent } from './offer-item/offer-item.component';
+import { ProvaModelComponent } from './prova-model/prova-model.component';
 
 @NgModule({
   imports: [CommonModule, FormsModule, IonicModule, OffersPageRoutingModule],
