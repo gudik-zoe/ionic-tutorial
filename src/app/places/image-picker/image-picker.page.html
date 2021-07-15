@@ -8,4 +8,6 @@
   </ion-button>
   <ion-img [src]="takenImage" *ngIf="takenImage"></ion-img>
 
+  <input type="file" *ngIf="userPicker" #filePicker (change)="onFileChosen($event)" />
+
 </div>

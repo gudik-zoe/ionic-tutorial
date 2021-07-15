@@ -71,7 +71,7 @@
 
   <div>
 
-    <ion-img class="image" role="button" [src]="selectedImage" *ngIf="selectedImage">
+    <ion-img class="image" role="button" [src]="selectedImage" *ngIf="selectedImage && !showImage">
     </ion-img>
     <ion-button color="primary" (click)="onPickImage()">
       <ion-icon name="camera" slot="start"></ion-icon>
