@@ -6,6 +6,7 @@ import { PlacesService } from '../places.service';
 import { SegmentChangeEventDetail } from '@ionic/core';
 import { Subscription } from 'rxjs';
 import { AuthServiceService } from 'src/app/auth/auth-service.service';
+import { Storage } from '@capacitor/storage';
 
 @Component({
   selector: 'app-discover',
@@ -45,6 +46,16 @@ export class DiscoverPage implements OnInit, OnDestroy {
       this.relevantPlaces = this.places;
       this.placesToBeLoad = this.relevantPlaces.slice(1);
     });
+    this.getDataFromStorage();
+  }
+  authData: any;
+  async getDataFromStorage() {
+    try {
+      this.authData = await Storage.get({ key: 'AuthData' });
+      console.log(JSON.parse(this.authData.value));
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   ionViewWillEnter() {
